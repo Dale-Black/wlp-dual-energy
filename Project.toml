@@ -1,6 +1,13 @@
 name = "wlp-dual-energy"
-[compat]
-julia = "1.9.0"
-DrWatson = "2.12.5"
+
 [deps]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+DICOM = "a26e6606-dd52-5f6a-a97f-4f611373d757"
+DICOMUtils = "d427e4c1-f2bb-45be-a498-7217d8b6de98"
 DrWatson = "634d3b9d-ee7a-5ddf-bec9-22491ea816e1"
+MAT = "23992714-dd62-5051-b70f-ba57cb901cac"
+PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+
+[compat]
+DrWatson = "2.12.5"
+julia = "1.9.0"
