@@ -18,6 +18,7 @@ end
 using DrWatson
 
 # ╔═╡ 5eee0e35-490f-4436-8c82-e0785a983b39
+# ╠═╡ show_logs = false
 @quickactivate "wlp-dual-energy"
 
 # ╔═╡ 1bf5f2a3-e0e0-4e90-b665-e7ca4cffb1aa
@@ -233,7 +234,7 @@ heatmap(transpose(vol_combined_val[:, :, z1]); colormap=:grays)
 # ╠═879fe54d-8d21-41dc-8661-6873092eb8f6
 # ╠═aeedbc91-c64f-4088-9fb7-5bd1cf5eb80a
 # ╟─af612106-012f-4121-a769-0ca476164bc6
-# ╠═e376957c-1e0b-4e5e-94d9-9c8c828b951c
+# ╟─e376957c-1e0b-4e5e-94d9-9c8c828b951c
 # ╟─f43157c9-7403-46da-b9a2-6be1b42bfdba
 # ╠═014ce041-e042-4925-9d0b-2198711b909a
 # ╠═ebd838e2-19ab-4072-bcee-8fb6a25e8747
