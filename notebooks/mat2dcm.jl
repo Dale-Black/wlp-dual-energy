@@ -124,17 +124,11 @@ md"""
 """
 
 # ╔═╡ 014ce041-e042-4925-9d0b-2198711b909a
-densities_val_water = [
-	"10_6_1"
-	"22_17_13"
-	"34_29_24"
-] # percentage water
-
-# ╔═╡ ebd838e2-19ab-4072-bcee-8fb6a25e8747
-dens_water = transpose(parse.(Int, stack(split.(densities_val_water, "_"))))
-
-# ╔═╡ c85b6536-da18-4807-96bb-b5aedbf6aa8d
-density_lipid = 100 .- (dens_water .+ 5)
+densities_val = [
+	"61_66_71",
+	"73_78_82",
+	"85_89_94"
+] # percentage lipid
 
 # ╔═╡ 0a4eebc2-c4bb-4744-9964-eecf7f5f9e2c
 energies_val = [80, 135]
@@ -143,11 +137,11 @@ energies_val = [80, 135]
 sizes_val = ["small", "medium", "large"]
 
 # ╔═╡ abccce08-cd6d-4f5c-af77-2412dcfa173b
-for (i, density_water) in enumerate(densities_val_water)
+for (i, density) in enumerate(densities_val)
 	for energy in energies_val
 		for _size in sizes_val
 			# Convert first slice into dcm
-			path1 = joinpath(datadir("mats", "val"), string(density_water, "energy", energy, _size, "_1.mat"))
+			path1 = joinpath(datadir("mats", "val"), string(density, "energy", energy, _size, "_1.mat"))
 			var1 = matread(path1)
 			img1 = var1[string("I")]
 			img1 = Int16.(round.(img1))
@@ -158,8 +152,7 @@ for (i, density_water) in enumerate(densities_val_water)
 			dcm[tag"Instance Number"] = 1
 			dcm[tag"Rows"] = size(img1, 1)
 			dcm[tag"Columns"] = size(img1, 2)
-
-			density = join(string.(density_lipid[i, :]), "_")
+			
 			output_dir = joinpath(datadir("dcms", "val"), string(density), string(_size), string(energy))
 			if !isdir(output_dir)
 				mkpath(output_dir)
@@ -169,7 +162,7 @@ for (i, density_water) in enumerate(densities_val_water)
 			dcm_write(output_path1, dcm)
 
 			# Convert second slice into dcm
-			path2 = joinpath(datadir("mats", "val"), string(density_water, "energy", energy, _size, "_2.mat"))
+			path2 = joinpath(datadir("mats", "val"), string(density, "energy", energy, _size, "_2.mat"))
 			var2 = matread(path2)
 			img2 = var2[string("I")]
 			img2 = Int16.(round.(img2))
@@ -185,7 +178,7 @@ for (i, density_water) in enumerate(densities_val_water)
 			dcm_write(output_path2, dcm)
 
 			# Convert second slice into dcm
-			path3 = joinpath(datadir("mats", "val"), string(density_water, "energy", energy, _size, "_3.mat"))
+			path3 = joinpath(datadir("mats", "val"), string(density, "energy", energy, _size, "_3.mat"))
 			var3 = matread(path3)
 			img3 = var3[string("I")]
 			img3 = Int16.(round.(img3))
@@ -237,8 +230,6 @@ heatmap(transpose(vol_combined_val[:, :, z1]); colormap=:grays)
 # ╟─e376957c-1e0b-4e5e-94d9-9c8c828b951c
 # ╟─f43157c9-7403-46da-b9a2-6be1b42bfdba
 # ╠═014ce041-e042-4925-9d0b-2198711b909a
-# ╠═ebd838e2-19ab-4072-bcee-8fb6a25e8747
-# ╠═c85b6536-da18-4807-96bb-b5aedbf6aa8d
 # ╠═0a4eebc2-c4bb-4744-9964-eecf7f5f9e2c
 # ╠═6bfa5d93-5607-424d-81ab-3b3b082d4a2d
 # ╠═abccce08-cd6d-4f5c-af77-2412dcfa173b

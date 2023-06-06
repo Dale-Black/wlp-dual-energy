@@ -150,7 +150,7 @@ begin
 	densities_val = [
 		"61_66_71"
 		"73_78_82"
-		"85_89_94"
+		# "85_89_94"
 	] # percentage lipid
 
 	sizes_val = ["small", "medium", "large"]
@@ -201,6 +201,11 @@ begin
 	)
 end;
 
+# ╔═╡ d5cdd336-ba50-497a-9397-b659d75c3029
+md"""
+## Run Predictions
+"""
+
 # ╔═╡ 5d6df93e-cf98-4eec-a3e2-6c7e8c7f2421
 begin
 	dfs = []
@@ -240,15 +245,28 @@ begin
 
 			
 
-			eroded_mask_L_HD = erode_recursively(mask_L_HD, 2)
+			# Large Inserts
+			large_erosions = 3
+			eroded_mask_L_HD = erode_recursively(mask_L_HD, large_erosions)
 			eroded_mask_L_HD_3D = cat(eroded_mask_L_HD, eroded_mask_L_HD, eroded_mask_L_HD, dims=3)
 
-			eroded_mask_L_MD = erode_recursively(mask_L_MD, 2)
+			eroded_mask_L_MD = erode_recursively(mask_L_MD, large_erosions)
 			eroded_mask_L_MD_3D = cat(eroded_mask_L_MD, eroded_mask_L_MD, eroded_mask_L_MD, dims=3)
 
-			eroded_mask_L_LD = erode_recursively(mask_L_LD, 2)
+			eroded_mask_L_LD = erode_recursively(mask_L_LD, large_erosions)
 			eroded_mask_L_LD_3D = cat(eroded_mask_L_LD, eroded_mask_L_LD, eroded_mask_L_LD, dims=3)
 
+			# Medium Inserts
+			medium_erosions = 1
+			eroded_mask_M_HD = erode_recursively(mask_M_HD, medium_erosions)
+			eroded_mask_M_HD_3D = cat(eroded_mask_M_HD, eroded_mask_M_HD, eroded_mask_M_HD, dims=3)
+		
+			eroded_mask_M_MD = erode_recursively(mask_M_MD, medium_erosions)
+			eroded_mask_M_MD_3D = cat(eroded_mask_M_MD, eroded_mask_M_MD, eroded_mask_M_MD, dims=3)
+		
+			eroded_mask_M_LD = erode_recursively(mask_M_LD, medium_erosions)
+			eroded_mask_M_LD_3D = cat(eroded_mask_M_LD, eroded_mask_M_LD, eroded_mask_M_LD, dims=3)
+			
 
 			# Low Energy
 			path_80 = datadir("dcms", "val", density, _size, string(energies[1]))
@@ -257,7 +275,8 @@ begin
 			pixel_size = DICOMUtils.get_pixel_size(dcm_80[1].meta)
 			
 			means_80 = [
-				mean(dcm_array_80[eroded_mask_L_HD_3D]), mean(dcm_array_80[eroded_mask_L_MD_3D]), mean(dcm_array_80[eroded_mask_L_LD_3D])
+				mean(dcm_array_80[eroded_mask_L_HD_3D]), mean(dcm_array_80[eroded_mask_L_MD_3D]), mean(dcm_array_80[eroded_mask_L_LD_3D]),
+				mean(dcm_array_80[eroded_mask_M_HD_3D]), mean(dcm_array_80[eroded_mask_M_MD_3D]), mean(dcm_array_80[eroded_mask_M_LD_3D]),
 			]
 
 			# High Energy
@@ -266,7 +285,8 @@ begin
 			dcm_array_135 = load_dcm_array(dcm_135)
 			
 			means_135 = [
-				mean(dcm_array_135[eroded_mask_L_HD_3D]), mean(dcm_array_135[eroded_mask_L_MD_3D]), mean(dcm_array_135[eroded_mask_L_LD_3D])
+				mean(dcm_array_135[eroded_mask_L_HD_3D]), mean(dcm_array_135[eroded_mask_L_MD_3D]), mean(dcm_array_135[eroded_mask_L_LD_3D]),
+				mean(dcm_array_135[eroded_mask_M_HD_3D]), mean(dcm_array_135[eroded_mask_M_MD_3D]), mean(dcm_array_135[eroded_mask_M_LD_3D]),
 			]
 
 			calculated_intensities = hcat(means_80, means_135)
@@ -280,7 +300,9 @@ begin
 				phantom_size = _size,
 				density = density,
 				ground_truth_density_large_inserts = parse.(Int, split(density, "_")),
-				predicted_densities_large_inserts = predicted_densities
+				predicted_densities_large_inserts = predicted_densities[1:3],
+				ground_truth_density_medium_inserts = parse.(Int, split(density, "_")),
+				predicted_densities_medium_inserts = predicted_densities[4:end]
 			)
 			push!(dfs, df_results)
 		end
@@ -314,5 +336,6 @@ dfs
 # ╟─e57a0c47-8037-482a-979e-58f814766c8d
 # ╠═3d4c1088-4e25-4f78-95ce-e2ea46075679
 # ╠═49374a5f-6d60-42c8-901d-5a284d7af8fd
+# ╟─d5cdd336-ba50-497a-9397-b659d75c3029
 # ╠═5d6df93e-cf98-4eec-a3e2-6c7e8c7f2421
 # ╠═653ab0d9-8dda-41a3-a4cf-59a5b7beaa03

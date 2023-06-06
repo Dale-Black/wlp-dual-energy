@@ -147,9 +147,11 @@ version = "1.16.1+1"
 
 [[deps.CalciumScoring]]
 deps = ["DSP", "Distributions", "ImageMorphology", "InteractiveUtils", "LsqFit", "Markdown", "Pkg", "PlutoUI", "Revise", "Statistics", "Test", "Unitful"]
-git-tree-sha1 = "1defa7d5ad9c18a587d2c5e08c010e0061f39054"
+git-tree-sha1 = "e5f8057d82acf9023868b0d8ab4ea841866c4b88"
+repo-rev = "master"
+repo-url = "https://github.com/Dale-Black/CalciumScoring.jl"
 uuid = "9c0cb1da-21b1-4615-967b-153e03110a28"
-version = "0.1.0"
+version = "0.1.2"
 
 [[deps.Calculus]]
 deps = ["LinearAlgebra"]
