@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.26
+# v0.19.27
 
 using Markdown
 using InteractiveUtils
@@ -19,10 +19,16 @@ using StatsBase: quantile!, rmsd
 
 # ╔═╡ 9ce934b8-aae9-491d-927e-f71aab15e592
 # ╠═╡ show_logs = false
-using DICOMUtils, CalciumScoring
+using  CalciumScoring
+
+# ╔═╡ ea3afefa-01e9-4297-8559-bb2edef19ada
+using MaterialDecomposition
 
 # ╔═╡ dc427017-af81-405c-bc92-5ac4ccd2b41f
 using GLM, MLJBase
+
+# ╔═╡ dae2e015-0a39-4ce3-845a-b9d87989712b
+include(srcdir("dicom_utils.jl"))
 
 # ╔═╡ eec36f96-4290-4d07-9df1-45419f8bc195
 include(srcdir("masks.jl"))
@@ -204,7 +210,7 @@ begin
 	for i in 1:length(densities_cal)
 		append!(
 			predicted_densities, 
-			score(calculated_intensities[i, 1], calculated_intensities[i, 2], ps, MaterialDecomposition()
+			quantify(calculated_intensities[i, 1], calculated_intensities[i, 2], ps,
 			)
 		)
 	end
@@ -351,7 +357,7 @@ begin
 			path_80 = datadir("dcms", "val", density, _size, string(energies[1]))
 			dcm_80 = dcmdir_parse(path_80)
 			dcm_array_80 = load_dcm_array(dcm_80)
-			pixel_size = DICOMUtils.get_pixel_size(dcm_80[1].meta)
+			pixel_size = get_pixel_size(dcm_80[1].meta)
 			
 			means_80 = [
 				mean(dcm_array_80[eroded_mask_L_HD_3D]), mean(dcm_array_80[eroded_mask_L_MD_3D]), mean(dcm_array_80[eroded_mask_L_LD_3D]),
@@ -371,7 +377,7 @@ begin
 			calculated_intensities = hcat(means_80, means_135)
 			predicted_densities = zeros(length(means_80))
 			for i in eachindex(predicted_densities)
-				predicted_densities[i] = score(means_80[i], means_80[i], ps, MaterialDecomposition())
+				predicted_densities[i] = quantify(means_80[i], means_80[i], ps)
 			end
 
 			
@@ -479,12 +485,111 @@ medphys_theme = Theme(
 	)
 );
 
+# ╔═╡ 87f4a121-e385-4d20-92df-82bba4eff328
+md"""
+### Accuracy
+"""
+
+# ╔═╡ 54140655-4dc8-4e53-96e0-821c2ca1e515
+new_df_low_md = vcat(dfs[1:length(dfs)]...);
+
+# ╔═╡ 1be32f5e-5c85-4118-bf5c-e53dc12809a1
+new_df_low_vf = vcat(dfs_low_vf[1:length(dfs_low_vf)]...);
+
+# ╔═╡ 32c1a063-94c5-4ff1-8057-122d24dd1923
+new_df_low_md
+
+# ╔═╡ ad06c138-05db-4226-85f2-2391c4916b6b
+new_df_low_vf
+
+# ╔═╡ 53115e78-9bcf-48ec-b76a-1a2d5bcf97cd
+co_1_low_md, r_squared_1_low_md, rms_values_1_low_md, pred_1_low_md = calculate_coefficients(new_df_low_md);
+
+# ╔═╡ d87751cd-f639-4b67-94a0-0590710c05b5
+co_1_low_vf, r_squared_1_low_vf, rms_values_1_low_vf, pred_1_low_vf = calculate_coefficients_vf(new_df_low_vf);
+
+# ╔═╡ 70951b1e-f0e7-40af-bb71-dc1366c33601
+function accuracy()
+	f = Figure()
+
+	##-- A --##
+	ax = Axis(
+		f[1, 1],
+		xticks = collect(-5:10:150),
+		yticks = collect(-5:10:150),
+		xlabel = "Known Mass (mg)",
+		ylabel = "Calculated Mass (mg)",
+		title = "Material Decomposition (Low Density)",
+	)
+	
+	df = new_df_low_md
+	sc1 = scatter!(
+		df[!, :ground_truth_density_large_inserts], df[!, :predicted_densities_large_inserts]
+	)
+	sc2 = scatter!(
+		df[!, :ground_truth_density_medium_inserts], df[!, :predicted_densities_medium_inserts]
+	)
+	# sc3 = scatter!(
+	# 	df[!, :gt_mass_small_inserts], df[!, :predicted_mass_small_inserts], color=:red
+	# )
+	ln1 = lines!([-1000, 1000], [-1000, 1000])
+	ln2 = lines!(collect(1:1000), pred_1_low_md, linestyle=:dashdot)
+	create_textbox(f[1, 1], co_1_low_md, r_squared_1_low_md, rms_values_1_low_md)
+	
+	xlims!(ax, low=-5, high=150)
+	ylims!(ax, low=-5, high=150)
+
+	ax = Axis(
+		f[2, 1],
+		xticks = collect(-5:10:200),
+		yticks = collect(-5:10:200),
+		xlabel = "Known Mass (mg)",
+		ylabel = "Calculated Mass (mg)",
+		title = "Volume Fraction (Low Density)",
+	)
+	
+	df = new_df_low_vf
+	sc1 = scatter!(
+		df[!, :ground_truth_density_large_inserts], df[!, :predicted_percentage_large_inserts]
+	)
+	sc2 = scatter!(
+		df[!, :ground_truth_density_medium_inserts], df[!, :predicted_mass_medium_inserts]
+	)
+	# sc3 = scatter!(
+	# 	df[!, :gt_mass_small_inserts], df[!, :predicted_mass_small_inserts], color=:red
+	# )
+	ln1 = lines!([-1000, 1000], [-1000, 1000])
+	ln2 = lines!(collect(1:1000), pred_1_low_vf, linestyle=:dashdot)
+	create_textbox(f[2, 1], co_1_low_vf, r_squared_1_low_vf, rms_values_1_low_vf)
+	
+	xlims!(ax, low=-5, high=150)
+	ylims!(ax, low=-5, high=200)
+
+
+	#-- LABELS --##
+	f[2, 2] = Legend(f, [sc1, sc2, ln1, ln2], ["Large Inserts", "Medium Inserts", "Unity", "Fitted Line"], framevisible = false)
+
+	
+	for (label, layout) in zip([["A"], ["B"]], [f[1,1], f[2, 1]])
+	    Label(layout[1, 1, TopLeft()], label,
+	        fontsize = 25,
+	        padding = (0, 60, 25, 0),
+	        halign = :right)
+	end
+	f
+end
+
+# ╔═╡ 128155d9-34c0-4f59-ada3-53e3d670c274
+with_theme(accuracy, medphys_theme)
+
 # ╔═╡ Cell order:
 # ╠═51258732-faf5-4705-82b6-64cdafe55340
 # ╠═482eb9fb-0254-40a3-8ccb-82c3fecb2080
 # ╠═f3404432-63b2-4655-b4d9-1ae40afc68ab
 # ╠═28b8a6aa-d229-47b7-b103-d45074e13efb
 # ╠═9ce934b8-aae9-491d-927e-f71aab15e592
+# ╠═ea3afefa-01e9-4297-8559-bb2edef19ada
+# ╠═dae2e015-0a39-4ce3-845a-b9d87989712b
 # ╠═75872b5b-97f2-4755-ae88-701c91eb129e
 # ╠═eec36f96-4290-4d07-9df1-45419f8bc195
 # ╟─4618af4a-6fa0-4db4-b460-9cb701e19ecf
@@ -502,7 +607,7 @@ medphys_theme = Theme(
 # ╠═99530752-6e29-44dd-93df-c44b768b7553
 # ╟─07d9df84-c369-444d-b165-ca81da1f1cef
 # ╠═910228ab-9ac7-4e53-b3e2-eb8f6f95e0b8
-# ╠═03272ae3-c8de-47d2-afb6-f7e4291c9515
+# ╟─03272ae3-c8de-47d2-afb6-f7e4291c9515
 # ╠═ca3ee165-af7f-49a0-8c8f-7e92004a7b7a
 # ╠═cc661c6e-3deb-49fe-a119-49c21b507e98
 # ╠═771d3743-e1b0-4924-af9f-f63e2c63b3ff
@@ -511,3 +616,12 @@ medphys_theme = Theme(
 # ╠═52d6b7bb-225d-4144-8565-48165c9d0f36
 # ╠═9725eee4-6cd8-4c98-ab1c-e9f4f1b05b48
 # ╠═60febdca-124e-4455-a3ae-9afb93189566
+# ╟─87f4a121-e385-4d20-92df-82bba4eff328
+# ╠═54140655-4dc8-4e53-96e0-821c2ca1e515
+# ╠═1be32f5e-5c85-4118-bf5c-e53dc12809a1
+# ╠═32c1a063-94c5-4ff1-8057-122d24dd1923
+# ╠═ad06c138-05db-4226-85f2-2391c4916b6b
+# ╠═53115e78-9bcf-48ec-b76a-1a2d5bcf97cd
+# ╠═d87751cd-f639-4b67-94a0-0590710c05b5
+# ╠═70951b1e-f0e7-40af-bb71-dc1366c33601
+# ╠═128155d9-34c0-4f59-ada3-53e3d670c274

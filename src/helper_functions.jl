@@ -9,15 +9,33 @@ function collect_tuple(tuple_array)
 end
 
 function calculate_coefficients(df;
-    label1=:ground_truth_mass_hd,
-    label2=:ground_truth_mass_md,
-    label3=:ground_truth_mass_ld,
-    label4=:predicted_mass_hd,
-    label5=:predicted_mass_md,
-    label6=:predicted_mass_ld
+    label1=:ground_truth_density_large_inserts,
+    label2=:ground_truth_density_medium_inserts,
+    label4=:predicted_densities_large_inserts,
+    label5=:predicted_densities_medium_inserts,
 )
-    gt_array = vec(hcat(df[!, label1], df[!, label2], df[!, label3]))
-    calc_array = vec(hcat(df[!, label4], df[!, label5], df[!, label6]))
+    gt_array = vec(hcat(df[!, label1], df[!, label2]))
+    calc_array = vec(hcat(df[!, label4], df[!, label5]))
+    data = DataFrame(X=gt_array, Y=calc_array)
+    model = lm(@formula(Y ~ X), data)
+    r_squared = GLM.r2(model)
+    rms_values = [
+        rms(data[!, :X], data[!, :Y]),
+        rmsd(data[!, :Y], GLM.predict(model))
+    ]
+    pred = GLM.predict(model, DataFrame(X=collect(1:1000)))
+
+    return coef(model), r_squared, rms_values, pred
+end
+
+function calculate_coefficients_vf(df;
+    label1=:ground_truth_density_large_inserts,
+    label2=:ground_truth_density_medium_inserts,
+    label4=:predicted_percentage_large_inserts,
+    label5=:predicted_mass_medium_inserts,
+)
+    gt_array = vec(hcat(df[!, label1], df[!, label2]))
+    calc_array = vec(hcat(df[!, label4], df[!, label5]))
     data = DataFrame(X=gt_array, Y=calc_array)
     model = lm(@formula(Y ~ X), data)
     r_squared = GLM.r2(model)
