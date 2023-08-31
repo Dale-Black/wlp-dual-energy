@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.27
+# v0.19.26
 
 using Markdown
 using InteractiveUtils
@@ -62,7 +62,8 @@ end
 
 # ╔═╡ 3e736a87-a9be-45e3-bff6-ed720ad7f184
 begin
-	percentages = [0, 20, 40, 70]
+	#error somewhere here
+	percentages = [0, 0, 40, 70]
 
 	for percentage in percentages
 	
@@ -94,6 +95,7 @@ end
 
 # ╔═╡ 7f85ff08-0048-4d01-9e80-dee769b7ec64
 begin
+	#error somewhere here
 	for percentage in percentages
 	
 		path = joinpath(datadir("dcms", "cal"),
@@ -118,7 +120,6 @@ begin
 	
 		hu_lipid = mean(calibration_rod)
 		push!(hu_lipid_array_low_energy,hu_lipid)
-		# ρ_calcium_100 = 0.100 # mg/cm^3
 	end
 end
 
@@ -229,13 +230,15 @@ md"""
 
 # ╔═╡ 5eb0eef2-1bd3-42c8-aa6d-b264d72000dd
 begin
+	#validation points are coming from here
 	densities_val = [
+		
 		"61_66_71"
 		"73_78_82"
-		# "85_89_94"
+		#"85_89_94"
 	] # percentage lipid
 
-	sizes_val = ["small", "medium", "large"]
+	sizes_val = ["medium", "large"]
 end;
 
 # ╔═╡ 99530752-6e29-44dd-93df-c44b768b7553
@@ -297,17 +300,7 @@ begin
 	dfs_low_vf = []
 	for density in densities_val
 		for _size in sizes_val
-			if _size == "small"
-				mask_L_HD = masks_small[:mask_L_HD]
-				mask_M_HD = masks_small[:mask_M_HD]
-				mask_S_HD = masks_small[:mask_S_HD]
-				mask_L_MD = masks_small[:mask_L_MD]
-				mask_M_MD = masks_small[:mask_M_MD]
-				mask_S_MD = masks_small[:mask_S_MD]
-				mask_L_LD = masks_small[:mask_L_LD]
-				mask_M_LD = masks_small[:mask_M_LD]
-				mask_S_LD = masks_small[:mask_S_LD]
-			elseif _size == "medium"
+			if _size == "medium"
 				mask_L_HD = masks_medium[:mask_L_HD]
 				mask_M_HD = masks_medium[:mask_M_HD]
 				mask_S_HD = masks_medium[:mask_S_HD]
@@ -402,7 +395,7 @@ begin
 
 			# Score Inserts
 			# hp stands for high percentage
-			hu_background = hu_background_le
+			hu_background = hu_background_le 
 			hu_lipid_hp = hu_lipid_hp_le
 			hu_lipid_mp = hu_lipid_mp_le
 			hu_lipid_lp = hu_lipid_hp_le
@@ -426,26 +419,28 @@ begin
 			percentage_lipid_medium_lp = score(dcm_array[eroded_mask_M_LD_3D], hu_lipid_lp, hu_background, VolumeFraction())
 
 			
-
+			#Put all the calculated percentages for large insert into list
 			predicted_percentage_large_inserts = [
 				percentage_lipid_large_hp, 
 				percentage_lipid_large_mp, 
 				percentage_lipid_large_lp
 			]
-	
+			#Put all the calculated percentages for medium insert into list
 			predicted_percentage_medium_inserts = [
 				percentage_lipid_medium_hp, 
 				percentage_lipid_medium_mp, 
 				percentage_lipid_medium_lp
 			]
-
+			#put data into table
 			df_results = DataFrame(
 				phantom_size = _size,
 				density = density,
 				insert_densities = [:low_percentage, :medium_percentage, :high_percentage],
 				ground_truth_density_large_inserts = parse.(Int, split(density, "_")),
+
+				#Put large insert calculated data into table
 				predicted_percentage_large_inserts = predicted_percentage_large_inserts,
-				
+				#and this is for medium insert
 				ground_truth_density_medium_inserts = parse.(Int, split(density, "_")),
 				predicted_mass_medium_inserts = predicted_percentage_medium_inserts,
 			)
@@ -543,8 +538,8 @@ function accuracy()
 		f[2, 1],
 		xticks = collect(-5:10:200),
 		yticks = collect(-5:10:200),
-		xlabel = "Known Mass (mg)",
-		ylabel = "Calculated Mass (mg)",
+		xlabel = "Known Percentage",
+		ylabel = "Calculated Percentage",
 		title = "Volume Fraction (Low Density)",
 	)
 	
