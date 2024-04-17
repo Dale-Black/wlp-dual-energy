@@ -228,7 +228,7 @@ heatmap(transpose(vol_combined_val[:, :, z1]); colormap=:grays)
 # ╠═aeedbc91-c64f-4088-9fb7-5bd1cf5eb80a
 # ╟─af612106-012f-4121-a769-0ca476164bc6
 # ╟─e376957c-1e0b-4e5e-94d9-9c8c828b951c
-# ╟─f43157c9-7403-46da-b9a2-6be1b42bfdba
+# ╠═f43157c9-7403-46da-b9a2-6be1b42bfdba
 # ╠═014ce041-e042-4925-9d0b-2198711b909a
 # ╠═0a4eebc2-c4bb-4744-9964-eecf7f5f9e2c
 # ╠═6bfa5d93-5607-424d-81ab-3b3b082d4a2d
