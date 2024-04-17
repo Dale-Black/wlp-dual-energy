@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.26
+# v0.19.40
 
 using Markdown
 using InteractiveUtils
@@ -14,26 +14,44 @@ macro bind(def, element)
     end
 end
 
-# ╔═╡ 7a5b0257-1b1c-425c-a1f5-dab3aa373307
+# ╔═╡ d7077f76-dff8-44bb-b646-a8b691e4c435
+# ╠═╡ show_logs = false
+using Pkg; Pkg.activate(".."); Pkg.instantiate()
+
+# ╔═╡ 8083b53c-2c5a-4a75-98f9-41cc7d060ec9
 using DrWatson
 
-# ╔═╡ 5200c317-3433-4f0d-8858-5fa3a0be4ee5
-# ╠═╡ show_logs = false
-@quickactivate "wlp-dual-energy"
+# ╔═╡ 7d4d0074-6954-4f0c-98ef-f5f9dacfd7e7
+using DICOM: dcmdir_parse
 
-# ╔═╡ 2445b905-8f0b-449f-b6cc-fc2cc2f0369a
-using PlutoUI, CairoMakie, Statistics, CSV, DataFrames, DICOM, CSVFiles
+# ╔═╡ 355a986b-a188-458d-a2a2-c1936d4eda7e
+using CairoMakie: Figure, Axis, heatmap!, scatter!
 
-# ╔═╡ ec7b3826-fcc3-4978-b153-c6b8160f23fd
+# ╔═╡ f4960eae-b3c8-4f87-ad1d-189ccd630cbb
+using DataFrames: DataFrame
+
+# ╔═╡ d8d7437e-3adc-4803-82da-2ebb95f80305
+using Statistics: mean
+
+# ╔═╡ 39fece51-1e13-4555-9649-6ded938e35da
+using PlutoUI: TableOfContents, Slider
+
+# ╔═╡ a5cb80f6-4db8-48a1-9524-095b8b13c787
 using StatsBase: quantile!, rmsd
 
-# ╔═╡ b361ab06-8767-4bab-b46b-01718e28b65a
-using DICOMUtils, CalciumScoring
+# ╔═╡ 2425710e-c4be-4b8a-8d4f-694e9892eb5a
+using MaterialDecomposition: fit_calibration, quantify
 
-# ╔═╡ fc84308a-95ab-456b-8de3-a12c1370af78
-include(srcdir("masks.jl"))
+# ╔═╡ da809d52-98fc-4ce8-aa55-19d1f97c5273
+include(srcdir("dicom_utils.jl"));
 
-# ╔═╡ c5979532-bcc2-4545-90d7-d0e2248431e9
+# ╔═╡ 71e251f6-75c0-459d-b7a7-4f01674ac817
+include(srcdir("masks.jl"));
+
+# ╔═╡ d9cf4c69-91c1-44c5-a8fc-d3ee173e3cb8
+import CSV
+
+# ╔═╡ 1a2c0525-30cc-4c5d-9631-c2d3f04df3f5
 TableOfContents()
 
 # ╔═╡ fec4a658-ddc5-43e5-b798-7ed584c550ac
@@ -135,8 +153,7 @@ begin
 	for i in 1:length(densities_cal)
 		append!(
 			predicted_densities, 
-			score(calculated_intensities[i, 1], calculated_intensities[i, 2], ps, MaterialDecomposition()
-			)
+			quantify(calculated_intensities[i, 1], calculated_intensities[i, 2], ps)
 		)
 	end
 end
@@ -297,11 +314,11 @@ begin
 	path_80 = datadir("dcms", "val", density, _size, string(energies[1]))
 	dcm_80 = dcmdir_parse(path_80)
 	dcm_array_80 = load_dcm_array(dcm_80)
-	pixel_size = DICOMUtils.get_pixel_size(dcm_80[1].meta)
+	pixel_size = get_pixel_size(dcm_80[1].meta)
 end;
 
 # ╔═╡ eec7cba6-68b1-4acb-b118-991c17d45dca
-@bind z1 PlutoUI.Slider(axes(dcm_array_80, 3); show_value = true, default = 2)
+@bind z1 Slider(axes(dcm_array_80, 3); show_value = true, default = 2)
 
 # ╔═╡ 8eeca471-6794-43e6-a646-cfc5042cb057
 let
@@ -310,7 +327,7 @@ let
 	# idxs_small = getindex.(findall(isone, eroded_mask_S_HD_3D[:, :, z1]), [1 2])
 	
 	f = Figure()
-	ax = CairoMakie.Axis(
+	ax = Axis(
 		f[1, 1]
 	)
 	heatmap!(transpose(dcm_array_80[:, :, z1]); colormap = :grays)
@@ -320,12 +337,19 @@ let
 end
 
 # ╔═╡ Cell order:
-# ╠═7a5b0257-1b1c-425c-a1f5-dab3aa373307
-# ╠═5200c317-3433-4f0d-8858-5fa3a0be4ee5
-# ╠═2445b905-8f0b-449f-b6cc-fc2cc2f0369a
-# ╠═ec7b3826-fcc3-4978-b153-c6b8160f23fd
-# ╠═b361ab06-8767-4bab-b46b-01718e28b65a
-# ╠═c5979532-bcc2-4545-90d7-d0e2248431e9
+# ╠═8083b53c-2c5a-4a75-98f9-41cc7d060ec9
+# ╠═d7077f76-dff8-44bb-b646-a8b691e4c435
+# ╠═7d4d0074-6954-4f0c-98ef-f5f9dacfd7e7
+# ╠═355a986b-a188-458d-a2a2-c1936d4eda7e
+# ╠═f4960eae-b3c8-4f87-ad1d-189ccd630cbb
+# ╠═d9cf4c69-91c1-44c5-a8fc-d3ee173e3cb8
+# ╠═d8d7437e-3adc-4803-82da-2ebb95f80305
+# ╠═39fece51-1e13-4555-9649-6ded938e35da
+# ╠═a5cb80f6-4db8-48a1-9524-095b8b13c787
+# ╠═2425710e-c4be-4b8a-8d4f-694e9892eb5a
+# ╠═da809d52-98fc-4ce8-aa55-19d1f97c5273
+# ╠═71e251f6-75c0-459d-b7a7-4f01674ac817
+# ╠═1a2c0525-30cc-4c5d-9631-c2d3f04df3f5
 # ╟─fec4a658-ddc5-43e5-b798-7ed584c550ac
 # ╠═2b83b4a6-a46d-42f0-9a4e-e2efb61e9017
 # ╟─20d50bc7-cf28-4ad4-9a0d-f29bef38758f
@@ -345,7 +369,6 @@ end
 # ╠═1c16f854-f66a-40b1-a450-9d6d5d815a02
 # ╠═8aed5131-d475-4d25-9181-a7b837d9bc83
 # ╠═a9ede6a4-c40e-4f9a-b3ae-82897928701b
-# ╠═fc84308a-95ab-456b-8de3-a12c1370af78
 # ╠═98e8db0e-5617-422e-8ffd-1e2bc3edd06b
 # ╟─8079214c-089d-4b67-bb0d-16d8edc1d45e
 # ╠═80257e95-938e-4265-a243-991591cfa5f3

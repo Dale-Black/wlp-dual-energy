@@ -1,4 +1,4 @@
-using ImageMorphology
+using ImageMorphology: erode, dilate
 
 function create_mask(array, mask)
     @assert size(array) == size(mask)

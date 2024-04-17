@@ -1,28 +1,43 @@
 ### A Pluto.jl notebook ###
-# v0.19.26
+# v0.19.40
 
 using Markdown
 using InteractiveUtils
 
+# ╔═╡ 3c017da1-54e9-45a5-a106-cff2950c61e7
+# ╠═╡ show_logs = false
+using Pkg; Pkg.activate(".."); Pkg.instantiate()
+
 # ╔═╡ 794bad23-f9f6-457b-8460-07526b3e2ac8
 using DrWatson
 
-# ╔═╡ c1c3df8c-06ed-47ca-98fe-79c092516a67
-# ╠═╡ show_logs = false
-@quickactivate "wlp-dual-energy"
+# ╔═╡ 57c75030-191e-49ec-88dd-e0f58fd0e7a5
+using DICOM: dcmdir_parse
 
-# ╔═╡ 1689f739-21c8-41ff-87ed-21d1a8f4f630
-using PlutoUI, CairoMakie, Statistics, CSV, DataFrames, DICOM, CSVFiles
+# ╔═╡ bf15402d-d0ad-4cdb-989f-b3c342b43f18
+using DataFrames: DataFrame
+
+# ╔═╡ faa70401-d8af-463e-8f08-46f46f082d8a
+using Statistics: mean
+
+# ╔═╡ 5fd49009-8673-4211-adf4-e1523af519b8
+using PlutoUI: TableOfContents
 
 # ╔═╡ 94e15038-a37e-4743-87de-8ddc2a40dca7
 using StatsBase: quantile!, rmsd
 
 # ╔═╡ dfaf0959-524e-4109-ba8e-868f5784f91c
 # ╠═╡ show_logs = false
-using DICOMUtils, CalciumScoring
+using MaterialDecomposition: fit_calibration, quantify
+
+# ╔═╡ d9cc612d-d685-4e8a-8e6e-fd8b3a40c85a
+include(srcdir("dicom_utils.jl"));
 
 # ╔═╡ 49374a5f-6d60-42c8-901d-5a284d7af8fd
-include(srcdir("masks.jl"))
+include(srcdir("masks.jl"));
+
+# ╔═╡ abbe615a-34f9-4045-bfac-a2c215ed8837
+import CSV
 
 # ╔═╡ d17a81d2-eab0-441e-8236-f34fde8b814c
 TableOfContents()
@@ -126,8 +141,7 @@ begin
 	for i in 1:length(densities_cal)
 		append!(
 			predicted_densities, 
-			score(calculated_intensities[i, 1], calculated_intensities[i, 2], ps, MaterialDecomposition()
-			)
+			quantify(calculated_intensities[i, 1], calculated_intensities[i, 2], ps)
 		)
 	end
 end
@@ -150,7 +164,7 @@ begin
 	densities_val = [
 		"61_66_71"
 		"73_78_82"
-		# "85_89_94"
+		"85_89_94"
 	] # percentage lipid
 
 	sizes_val = ["small", "medium", "large"]
@@ -272,9 +286,9 @@ begin
 			path_80 = datadir("dcms", "val", density, _size, string(energies[1]))
 			dcm_80 = dcmdir_parse(path_80)
 			dcm_array_80 = load_dcm_array(dcm_80)
-			pixel_size = DICOMUtils.get_pixel_size(dcm_80[1].meta)
+			pixel_size = get_pixel_size(dcm_80[1].meta)
 			
-			means_80 = [
+			local means_80 = [
 				mean(dcm_array_80[eroded_mask_L_HD_3D]), mean(dcm_array_80[eroded_mask_L_MD_3D]), mean(dcm_array_80[eroded_mask_L_LD_3D]),
 				mean(dcm_array_80[eroded_mask_M_HD_3D]), mean(dcm_array_80[eroded_mask_M_MD_3D]), mean(dcm_array_80[eroded_mask_M_LD_3D]),
 			]
@@ -284,15 +298,15 @@ begin
 			dcm_135 = dcmdir_parse(path_135)
 			dcm_array_135 = load_dcm_array(dcm_135)
 			
-			means_135 = [
+			local means_135 = [
 				mean(dcm_array_135[eroded_mask_L_HD_3D]), mean(dcm_array_135[eroded_mask_L_MD_3D]), mean(dcm_array_135[eroded_mask_L_LD_3D]),
 				mean(dcm_array_135[eroded_mask_M_HD_3D]), mean(dcm_array_135[eroded_mask_M_MD_3D]), mean(dcm_array_135[eroded_mask_M_LD_3D]),
 			]
 
-			calculated_intensities = hcat(means_80, means_135)
-			predicted_densities = zeros(length(means_80))
+			local calculated_intensities = hcat(means_80, means_135)
+			local predicted_densities = zeros(length(means_80))
 			for i in eachindex(predicted_densities)
-				predicted_densities[i] = score(means_80[i], means_80[i], ps, MaterialDecomposition())
+				predicted_densities[i] = quantify(means_80[i], means_80[i], ps)
 			end
 
 			
@@ -314,10 +328,16 @@ dfs
 
 # ╔═╡ Cell order:
 # ╠═794bad23-f9f6-457b-8460-07526b3e2ac8
-# ╠═c1c3df8c-06ed-47ca-98fe-79c092516a67
-# ╠═1689f739-21c8-41ff-87ed-21d1a8f4f630
+# ╠═3c017da1-54e9-45a5-a106-cff2950c61e7
+# ╠═57c75030-191e-49ec-88dd-e0f58fd0e7a5
+# ╠═bf15402d-d0ad-4cdb-989f-b3c342b43f18
+# ╠═abbe615a-34f9-4045-bfac-a2c215ed8837
+# ╠═faa70401-d8af-463e-8f08-46f46f082d8a
+# ╠═5fd49009-8673-4211-adf4-e1523af519b8
 # ╠═94e15038-a37e-4743-87de-8ddc2a40dca7
 # ╠═dfaf0959-524e-4109-ba8e-868f5784f91c
+# ╠═d9cc612d-d685-4e8a-8e6e-fd8b3a40c85a
+# ╠═49374a5f-6d60-42c8-901d-5a284d7af8fd
 # ╠═d17a81d2-eab0-441e-8236-f34fde8b814c
 # ╟─d682c750-5843-457b-b52e-c4986e6a48ca
 # ╠═7149a771-1db8-4571-a691-a9d62e1cfdfa
@@ -335,7 +355,6 @@ dfs
 # ╠═1fb32e9e-e61e-4641-b8df-1e16fc882945
 # ╟─e57a0c47-8037-482a-979e-58f814766c8d
 # ╠═3d4c1088-4e25-4f78-95ce-e2ea46075679
-# ╠═49374a5f-6d60-42c8-901d-5a284d7af8fd
 # ╟─d5cdd336-ba50-497a-9397-b659d75c3029
 # ╠═5d6df93e-cf98-4eec-a3e2-6c7e8c7f2421
 # ╠═653ab0d9-8dda-41a3-a4cf-59a5b7beaa03
