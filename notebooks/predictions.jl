@@ -17,6 +17,9 @@ using DICOM: dcmdir_parse
 # ╔═╡ bf15402d-d0ad-4cdb-989f-b3c342b43f18
 using DataFrames: DataFrame
 
+# ╔═╡ abbe615a-34f9-4045-bfac-a2c215ed8837
+using CSV: read
+
 # ╔═╡ faa70401-d8af-463e-8f08-46f46f082d8a
 using Statistics: mean
 
@@ -35,9 +38,6 @@ include(srcdir("dicom_utils.jl"));
 
 # ╔═╡ 49374a5f-6d60-42c8-901d-5a284d7af8fd
 include(srcdir("masks.jl"));
-
-# ╔═╡ abbe615a-34f9-4045-bfac-a2c215ed8837
-import CSV
 
 # ╔═╡ d17a81d2-eab0-441e-8236-f34fde8b814c
 TableOfContents()
@@ -179,39 +179,39 @@ md"""
 begin
 	# Load masks
 	masks_large = Dict(
-		:mask_L_HD => Array(CSV.read(datadir("julia_arrays", "large", "mask_L_HD.csv"), DataFrame; header=false)),
-		:mask_M_HD => Array(CSV.read(datadir("julia_arrays", "large", "mask_M_HD.csv"), DataFrame; header=false)),
-		:mask_S_HD => Array(CSV.read(datadir("julia_arrays", "large", "mask_S_HD.csv"), DataFrame; header=false)),
-		:mask_L_MD => Array(CSV.read(datadir("julia_arrays", "large", "mask_L_MD.csv"), DataFrame; header=false)),
-		:mask_M_MD => Array(CSV.read(datadir("julia_arrays", "large", "mask_M_MD.csv"), DataFrame; header=false)),
-		:mask_S_MD => Array(CSV.read(datadir("julia_arrays", "large", "mask_S_MD.csv"), DataFrame; header=false)),
-		:mask_M_LD => Array(CSV.read(datadir("julia_arrays", "large", "mask_M_LD.csv"), DataFrame; header=false)),
-		:mask_L_LD => Array(CSV.read(datadir("julia_arrays", "large", "mask_L_LD.csv"), DataFrame; header=false)),
-		:mask_S_LD => Array(CSV.read(datadir("julia_arrays", "large", "mask_S_LD.csv"), DataFrame; header=false)),
+		:mask_L_HD => Array(read(datadir("julia_arrays", "large", "mask_L_HD.csv"), DataFrame; header=false)),
+		:mask_M_HD => Array(read(datadir("julia_arrays", "large", "mask_M_HD.csv"), DataFrame; header=false)),
+		:mask_S_HD => Array(read(datadir("julia_arrays", "large", "mask_S_HD.csv"), DataFrame; header=false)),
+		:mask_L_MD => Array(read(datadir("julia_arrays", "large", "mask_L_MD.csv"), DataFrame; header=false)),
+		:mask_M_MD => Array(read(datadir("julia_arrays", "large", "mask_M_MD.csv"), DataFrame; header=false)),
+		:mask_S_MD => Array(read(datadir("julia_arrays", "large", "mask_S_MD.csv"), DataFrame; header=false)),
+		:mask_M_LD => Array(read(datadir("julia_arrays", "large", "mask_M_LD.csv"), DataFrame; header=false)),
+		:mask_L_LD => Array(read(datadir("julia_arrays", "large", "mask_L_LD.csv"), DataFrame; header=false)),
+		:mask_S_LD => Array(read(datadir("julia_arrays", "large", "mask_S_LD.csv"), DataFrame; header=false)),
 	)
 	
 	masks_medium = Dict(
-		:mask_L_HD => Array(CSV.read(datadir("julia_arrays", "medium", "mask_L_HD.csv"), DataFrame; header=false)),
-		:mask_M_HD => Array(CSV.read(datadir("julia_arrays", "medium", "mask_M_HD.csv"), DataFrame; header=false)),
-		:mask_S_HD => Array(CSV.read(datadir("julia_arrays", "medium", "mask_S_HD.csv"), DataFrame; header=false)),
-		:mask_L_MD => Array(CSV.read(datadir("julia_arrays", "medium", "mask_L_MD.csv"), DataFrame; header=false)),
-		:mask_M_MD => Array(CSV.read(datadir("julia_arrays", "medium", "mask_M_MD.csv"), DataFrame; header=false)),
-		:mask_S_MD => Array(CSV.read(datadir("julia_arrays", "medium", "mask_S_MD.csv"), DataFrame; header=false)),
-		:mask_M_LD => Array(CSV.read(datadir("julia_arrays", "medium", "mask_M_LD.csv"), DataFrame; header=false)),
-		:mask_L_LD => Array(CSV.read(datadir("julia_arrays", "medium", "mask_L_LD.csv"), DataFrame; header=false)),
-		:mask_S_LD => Array(CSV.read(datadir("julia_arrays", "medium", "mask_S_LD.csv"), DataFrame; header=false)),
+		:mask_L_HD => Array(read(datadir("julia_arrays", "medium", "mask_L_HD.csv"), DataFrame; header=false)),
+		:mask_M_HD => Array(read(datadir("julia_arrays", "medium", "mask_M_HD.csv"), DataFrame; header=false)),
+		:mask_S_HD => Array(read(datadir("julia_arrays", "medium", "mask_S_HD.csv"), DataFrame; header=false)),
+		:mask_L_MD => Array(read(datadir("julia_arrays", "medium", "mask_L_MD.csv"), DataFrame; header=false)),
+		:mask_M_MD => Array(read(datadir("julia_arrays", "medium", "mask_M_MD.csv"), DataFrame; header=false)),
+		:mask_S_MD => Array(read(datadir("julia_arrays", "medium", "mask_S_MD.csv"), DataFrame; header=false)),
+		:mask_M_LD => Array(read(datadir("julia_arrays", "medium", "mask_M_LD.csv"), DataFrame; header=false)),
+		:mask_L_LD => Array(read(datadir("julia_arrays", "medium", "mask_L_LD.csv"), DataFrame; header=false)),
+		:mask_S_LD => Array(read(datadir("julia_arrays", "medium", "mask_S_LD.csv"), DataFrame; header=false)),
 	)
 
 	masks_small = Dict(
-		:mask_L_HD => Array(CSV.read(datadir("julia_arrays", "small", "mask_L_HD.csv"), DataFrame; header=false)),
-		:mask_M_HD => Array(CSV.read(datadir("julia_arrays", "small", "mask_M_HD.csv"), DataFrame; header=false)),
-		:mask_S_HD => Array(CSV.read(datadir("julia_arrays", "small", "mask_S_HD.csv"), DataFrame; header=false)),
-		:mask_L_MD => Array(CSV.read(datadir("julia_arrays", "small", "mask_L_MD.csv"), DataFrame; header=false)),
-		:mask_M_MD => Array(CSV.read(datadir("julia_arrays", "small", "mask_M_MD.csv"), DataFrame; header=false)),
-		:mask_S_MD => Array(CSV.read(datadir("julia_arrays", "small", "mask_S_MD.csv"), DataFrame; header=false)),
-		:mask_M_LD => Array(CSV.read(datadir("julia_arrays", "small", "mask_M_LD.csv"), DataFrame; header=false)),
-		:mask_L_LD => Array(CSV.read(datadir("julia_arrays", "small", "mask_L_LD.csv"), DataFrame; header=false)),
-		:mask_S_LD => Array(CSV.read(datadir("julia_arrays", "small", "mask_S_LD.csv"), DataFrame; header=false)),
+		:mask_L_HD => Array(read(datadir("julia_arrays", "small", "mask_L_HD.csv"), DataFrame; header=false)),
+		:mask_M_HD => Array(read(datadir("julia_arrays", "small", "mask_M_HD.csv"), DataFrame; header=false)),
+		:mask_S_HD => Array(read(datadir("julia_arrays", "small", "mask_S_HD.csv"), DataFrame; header=false)),
+		:mask_L_MD => Array(read(datadir("julia_arrays", "small", "mask_L_MD.csv"), DataFrame; header=false)),
+		:mask_M_MD => Array(read(datadir("julia_arrays", "small", "mask_M_MD.csv"), DataFrame; header=false)),
+		:mask_S_MD => Array(read(datadir("julia_arrays", "small", "mask_S_MD.csv"), DataFrame; header=false)),
+		:mask_M_LD => Array(read(datadir("julia_arrays", "small", "mask_M_LD.csv"), DataFrame; header=false)),
+		:mask_L_LD => Array(read(datadir("julia_arrays", "small", "mask_L_LD.csv"), DataFrame; header=false)),
+		:mask_S_LD => Array(read(datadir("julia_arrays", "small", "mask_S_LD.csv"), DataFrame; header=false)),
 	)
 end;
 
