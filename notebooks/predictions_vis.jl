@@ -27,6 +27,9 @@ using CairoMakie: Figure, Axis, heatmap!, scatter!
 # ╔═╡ c4ab9bfa-3a6f-440f-8a9d-adf1636299e2
 using ImageMorphology: erode, dilate
 
+# ╔═╡ 08276075-156a-4e49-8b06-6c317b6b9541
+using ImageMorphology: centered
+
 # ╔═╡ f4960eae-b3c8-4f87-ad1d-189ccd630cbb
 using DataFrames: DataFrame
 
@@ -47,9 +50,6 @@ using MaterialDecomposition: fit_calibration, quantify
 
 # ╔═╡ 5da4e3b7-d6f8-42c1-9144-42bf6b39693e
 using CalciumScoring: score, VolumeFraction
-
-# ╔═╡ 08276075-156a-4e49-8b06-6c317b6b9541
-using ImageMorphology: centered
 
 # ╔═╡ 1a2c0525-30cc-4c5d-9631-c2d3f04df3f5
 TableOfContents()
@@ -335,7 +335,7 @@ md"""
 density = densities_val[2]
 
 # ╔═╡ 1c16f854-f66a-40b1-a450-9d6d5d815a02
-phantom_size = sizes_val[1] # size of the actual phantom (not the inserts)
+phantom_size = sizes_val[2] # size of the actual phantom (not the inserts)
 
 # ╔═╡ 8aed5131-d475-4d25-9181-a7b837d9bc83
 begin
@@ -587,7 +587,7 @@ voxel_size = prod(pixel_size)
 
 # ╔═╡ 03f8c810-3e1b-475d-86af-f81d7470a01c
 md"""
-**High Density Outer Insert**
+**High Lipid Percentage Outer Insert**
 """
 
 # ╔═╡ 499a8c37-0b59-4616-9fa6-f89579c3b46b
@@ -630,7 +630,7 @@ lipid_mass_vf_high_lipid_percentage_outer = score(
 
 # ╔═╡ 192b3805-94f3-4797-a1af-2f1ff023783f
 md"""
-**Medium Density Outer Insert**
+**Medium Lipid Percentage Outer Insert**
 """
 
 # ╔═╡ 39eb363c-18f9-46c5-96d5-695b781acc94
@@ -673,7 +673,7 @@ lipid_mass_vf_medium_lipid_percentage_outer = score(
 
 # ╔═╡ e3af684d-07af-42b3-a4b2-680db74147c7
 md"""
-**Low Density Outer Insert**
+**Low Lipid Percentage Outer Insert**
 """
 
 # ╔═╡ e70aeb34-eb69-4b26-bb35-5b41740f1c10
@@ -716,7 +716,7 @@ lipid_mass_vf_low_lipid_percentage_outer = score(
 
 # ╔═╡ 840219c7-c85a-4a34-8aa9-9455d698c50c
 md"""
-**High Density Middle Insert**
+**High Lipid Percentage Middle Insert**
 """
 
 # ╔═╡ 932ed040-96f0-4578-b1a4-9c953c907c94
@@ -762,6 +762,7 @@ lipid_mass_vf_high_lipid_percentage_middle = score(
 # ╠═7d4d0074-6954-4f0c-98ef-f5f9dacfd7e7
 # ╠═355a986b-a188-458d-a2a2-c1936d4eda7e
 # ╠═c4ab9bfa-3a6f-440f-8a9d-adf1636299e2
+# ╠═08276075-156a-4e49-8b06-6c317b6b9541
 # ╠═f4960eae-b3c8-4f87-ad1d-189ccd630cbb
 # ╠═d9cf4c69-91c1-44c5-a8fc-d3ee173e3cb8
 # ╠═d8d7437e-3adc-4803-82da-2ebb95f80305
@@ -797,7 +798,6 @@ lipid_mass_vf_high_lipid_percentage_middle = score(
 # ╠═8aed5131-d475-4d25-9181-a7b837d9bc83
 # ╠═4bfb72e7-d8d6-4182-8a01-6bcc76c376f7
 # ╠═3c55665b-ff97-44d8-b7b4-be9b3df74927
-# ╠═08276075-156a-4e49-8b06-6c317b6b9541
 # ╟─de09b176-3bff-4e49-9bfa-c60df13116e1
 # ╠═e7f988f9-dac1-4e0a-a58c-ccf5aefd2588
 # ╠═35d8c23d-1cc1-470c-9ffa-c96265dfcd72
